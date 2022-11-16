@@ -116,7 +116,7 @@
 ...
 </code></pre>
 <p>Saving it, will get rid of the red error, but now is plain black!!!</p>
-<p>Lets fix it again, lets create the <code>GameGridView</code> widget into to the <code>Flex</code> widget children:</p>
+<p>Lets fix it again, lets create the <code>GameGridView</code> widget and add it to the <code>Flex</code> widget children:</p>
 <pre><code language="language-dart" class="language-dart">...
 Flex(
     ...
@@ -195,8 +195,119 @@ Flex(
     }),     
 </code></pre>
 <p>Replace the <code>Container()</code> with <code>GameGridBoxView()</code></p>
-<p>Finally we see somthing!!!</p>
-<p>You can tweak the numbers on the grid to experiment and hot-reload to see the changes.</p>
+<p>Finally we started to see something!!!</p>
+<p>You can tweak the numbers on the grid to experiment, dont forget to hot-reload to see the changes.</p>
+<p>Ok you got so far, but stil there are much to do.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 5 - Keyboard" duration="0">
+        <p>Now that we have the game grid widget in place, lets focus on the Keyboard.</p>
+<p>Go to your <code>pubspec.yaml</code> and add to the <code>dependencies</code> the following keyboard package:</p>
+<pre><code language="language-yaml" class="language-yaml">virtual_keyboard_multi_language:
+    git:
+      url: git://github.com/hassaanalansary/virtual_keyboard_multi_language.git
+      ref: master
+</code></pre>
+<p>Run the <code>pub get</code> to update the project. This will fetch the required package to have a virtual keyboard to capture the characters.</p>
+<p>Now lets build the keyboad widget:</p>
+<pre><code language="language-dart" class="language-dart">Flexible(
+  child: Container(
+    padding: const EdgeInsets.only(bottom: 32),
+    child: VirtualKeyboard(
+      height: 200,
+      textColor: Colors.white,
+      fontSize: 18,
+      type: VirtualKeyboardType.Alphanumeric,
+      alwaysCaps: true,
+    ),
+  ),
+)
+</code></pre>
+<p>Hmm it feels that is missing something, right?</p>
+<p>Q: How can we capture the key events??</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 6 - Listen to Keyboard" duration="0">
+        <p>Lets start by adding an Event Listener, so in the <code>VirtualKeyboard</code> widget, add the <code>postKeyPress</code> event listener.</p>
+<pre><code language="language-dart" class="language-dart">...
+VirtualKeyboard(
+  ...
+  postKeyPress: (key) {}
+  ...
+...
+</code></pre>
+<p>This will capture all the clicked keyboard keys.</p>
+<p>Ok, so far we have the Grid view, Keyboard and the event to listen, but how we can fill the squares with the clicked keys?</p>
+<p>Lets start by an example:</p>
+<p>Create a <code>index</code> and a <code>Map</code> that will hold our key and position, like this:</p>
+<pre><code language="language-dart" class="language-dart">int index = 0;
+Map&lt;int, String&gt; words = {};
+</code></pre>
+<p>Add to the current file.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 7 - Game logic example" duration="0">
+        <p>Now we&#39;ll do some game logic,</p>
+<p>Then on the <code>postKeyPress</code> event listener lets try by doing this:</p>
+<pre><code language="language-dart" class="language-dart">...
+VirtualKeyboard(
+  ...
+  postKeyPress: (key) {
+    words[index] = key.text;
+  }
+  ...
+...
+</code></pre>
+<p>Now will need to change the <code>GameGridView</code> widget and the <code>GameGridBoxView</code> widget to pass as the arguments the <code>index</code> and the <code>Map</code></p>
+<pre><code language="language-dart" class="language-dart">class GameGridView extends StatelessWidget {
+  const GameGridView({
+    super.key
+    this.index,
+    this.words
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ...
+    itemBuilder: (BuildContext context, int index) {
+        return GameGridBoxView(index: index, words: words);
+    }),
+    ...
+  }
+  ...
+</code></pre>
+<pre><code language="language-dart" class="language-dart">class GameGridBoxView extends StatelessWidget {
+  const GameGridBoxView({
+    Key? key,
+    this.index,
+    this.words
+  }) : super(key: key);
+
+  final int index;
+  final Map&lt;int, String&gt; words;
+
+  @override
+  Widget build(BuildContext context) {
+    ...
+    child: Text(words[index]?.toUpperCase() ?? &#34;&#34;),
+    ...
+  }
+....
+</code></pre>
+<p>Any errors? do you see something?</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 8" duration="0">
+        <p>Ok lets find out what is still missing,</p>
+<p>Tip: how can we change the state?</p>
 
 
       </google-codelab-step>
