@@ -117,7 +117,7 @@ So, now that we have a red screen in our simulator, lets fix that, by changing t
 
 Saving it, will get rid of the red error, but now is plain black!!!
 
-Lets fix it again, lets create the `GameGridView` widget into to the `Flex` widget children:
+Lets fix it again, lets create the `GameGridView` widget and add it to the `Flex` widget children:
 
 ```dart
 ...
@@ -206,9 +206,144 @@ Correct!!! will need to change this line in the `GridView.builder`:
 
 Replace the `Container()` with `GameGridBoxView()`
 
-Finally we see somthing!!!
+Finally we started to see something!!!
 
-You can tweak the numbers on the grid to experiment and hot-reload to see the changes.
+You can tweak the numbers on the grid to experiment, dont forget to hot-reload to see the changes.
+
+Ok you got so far, but stil there are much to do.
+
+## Step 5 - Keyboard
+
+Now that we have the game grid widget in place, lets focus on the Keyboard.
+
+Go to your `pubspec.yaml` and add to the `dependencies` the following keyboard package:
+
+```yaml
+virtual_keyboard_multi_language:
+    git:
+      url: git://github.com/hassaanalansary/virtual_keyboard_multi_language.git
+      ref: master
+```
+
+Run the `pub get` to update the project. This will fetch the required package to have 
+a virtual keyboard to capture the characters.
+
+Now lets build the keyboad widget:
+
+```dart
+Flexible(
+  child: Container(
+    padding: const EdgeInsets.only(bottom: 32),
+    child: VirtualKeyboard(
+      height: 200,
+      textColor: Colors.white,
+      fontSize: 18,
+      type: VirtualKeyboardType.Alphanumeric,
+      alwaysCaps: true,
+    ),
+  ),
+)
+```
+
+Hmm it feels that is missing something, right?
+
+Q: How can we capture the key events??
+
+## Step 6 - Listen to Keyboard
+
+Lets start by adding an Event Listener, so in the `VirtualKeyboard` widget,
+add the `postKeyPress` event listener.
+
+```dart
+...
+VirtualKeyboard(
+  ...
+  postKeyPress: (key) {}
+  ...
+...
+```
+
+This will capture all the clicked keyboard keys.
+
+Ok, so far we have the Grid view, Keyboard and the event to listen, 
+but how we can fill the squares with the clicked keys?
+
+Lets start by an example:
+
+Create a `index` and a `Map` that will hold our key and position, like this:
+
+```dart
+int index = 0;
+Map<int, String> words = {};
+```
+
+Add to the current file.
+
+## Step 7 - Game logic example
+
+Now we'll do some game logic,
+
+Then on the `postKeyPress` event listener lets try by doing this:
+
+```dart
+...
+VirtualKeyboard(
+  ...
+  postKeyPress: (key) {
+    words[index] = key.text;
+  }
+  ...
+...
+```
+
+Now will need to change the `GameGridView` widget and the `GameGridBoxView` widget to pass as the arguments the `index` and the `Map`
+
+```dart
+class GameGridView extends StatelessWidget {
+  const GameGridView({
+    super.key
+    this.index,
+    this.words
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ...
+    itemBuilder: (BuildContext context, int index) {
+        return GameGridBoxView(index: index, words: words);
+    }),
+    ...
+  }
+  ...
+```
+
+```dart
+class GameGridBoxView extends StatelessWidget {
+  const GameGridBoxView({
+    Key? key,
+    this.index,
+    this.words
+  }) : super(key: key);
+
+  final int index;
+  final Map<int, String> words;
+
+  @override
+  Widget build(BuildContext context) {
+    ...
+    child: Text(words[index]?.toUpperCase() ?? ""),
+    ...
+  }
+....
+```
+
+Any errors? do you see something?
+
+## Step 8
+
+Ok lets find out what is still missing,
+
+Tip: how can we change the state?
 
 ## Takeaways
 
